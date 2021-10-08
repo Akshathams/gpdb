@@ -242,6 +242,13 @@ class GpRecoversegTestCase(GpTestCase):
 
         self.assertEqual(cm.exception.code, 1)
 
+    def test_gprecoverseg_with_mirrorless(self):
+        self.gpArrayMock.hasMirrors = False
+        with self.assertRaisesRegex(ExceptionNoStackTraceNeeded,
+                                    "GPDB Mirroring replication is not configured for this Greenplum Database instance."):
+            self.subject.run()
+        #self.gpArrayMock.hasMirrors = True
+
     @patch.object(TableLogger, "info")
     def test_successful_recover(self, _):
         self.gpArrayMock.get_unbalanced_segdbs.return_value = [self.primary0]
@@ -269,12 +276,7 @@ class GpRecoversegTestCase(GpTestCase):
 
         self.assertEqual(cm.exception.code, 0)
 
-    def test_gprecoverseg_with_mirrorless(self):
-        self.gpArrayMock.hasMirrors = False
-        with self.assertRaisesRegex(ExceptionNoStackTraceNeeded,
-                                    "GPDB Mirroring replication is not configured for this Greenplum Database instance."):
-            self.subject.run()
-        self.gpArrayMock.hasMirrors = True
+
 
     def _create_gparray_with_2_primary_2_mirrors(self):
         coordinator = Segment.initFromString(
